@@ -1,0 +1,17 @@
+Use thse services located on
+
+networks:
+  cacher-network:
+    external: true
+
+
+# Set APT to use the caching proxy on the custom port
+RUN echo 'Acquire::http::Proxy "http://monolithic-cache:8081";' > /etc/apt/apt.conf.d/01proxy
+
+# Update and install packages
+RUN apt-get update && apt-get install -y curl git
+
+# Download a file from GitHub using the cache proxy on the custom port
+RUN curl -L -o /usr/local/bin/some-binary "http://monolithic-cache:8081/owner/repo/releases/download/v1.0.0/some-binary"
+
+# Continue with the rest of your Dockerfile

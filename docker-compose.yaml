@@ -1,0 +1,52 @@
+services:
+  monolithic-cache:
+    image: lancachenet/monolithic:latest
+    container_name: monolithic-cache
+    ports:
+      - "8081:80"   # HTTP traffic on port 8081
+      - "8443:443"  # HTTPS traffic on port 8443
+    volumes:
+      - cache-data:/data/cache
+      - cache-logs:/data/logs
+    environment:
+      UPSTREAM_DNS: "8.8.8.8 8.8.4.4"  # DNS servers
+      CACHE_MEM_SIZE: "500m"  # Memory for cache index
+      CACHE_DISK_SIZE: "500g"  # Disk size for cache
+      CACHE_MAX_AGE: "365d"  # Max age of cache files
+    networks:
+      - cache-network
+
+
+  portainer:
+    image: portainer/portainer-ce:latest
+    container_name: portainer
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer_data:/data
+    ports:
+      - "9000:9000"
+    restart: unless-stopped
+    networks:
+      - cache-network
+
+
+  watchtower:
+    image: containrrr/watchtower:latest
+    container_name: watchtower
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: --interval 86400 --cleanup
+    restart: unless-stopped
+    networks:
+      - cache-network
+
+
+
+volumes:
+  cache-data:
+  cache-logs:
+  portainer_data:
+
+networks:
+  cache-network:
+    external: true
