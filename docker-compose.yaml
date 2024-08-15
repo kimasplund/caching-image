@@ -16,7 +16,6 @@ services:
     networks:
       - cache-network
 
-
   portainer:
     image: portainer/portainer-ce:latest
     container_name: portainer
@@ -28,7 +27,6 @@ services:
     restart: unless-stopped
     networks:
       - cache-network
-
 
   watchtower:
     image: containrrr/watchtower:latest
